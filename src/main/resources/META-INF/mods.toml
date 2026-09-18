@@ -1,0 +1,33 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+issueTrackerURL=""
+
+[[mods]]
+modId="customcape"
+version="1.0.0"
+displayName="Custom Cape (Self)"
+authors="You"
+description='''
+自定义披风（仅自己可见）。
+将 cape.png 放到 .minecraft/config/CustomCape/ 目录即可，
+游戏内输入 /customcape reload 重新加载。
+'''
+displayTest="IGNORE_ALL_VERSION"
+
+[[mixins]]
+config="customcape.mixins.json"
+
+[[dependencies.customcape]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.customcape]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.21)"
+    ordering="NONE"
+    side="CLIENT"
