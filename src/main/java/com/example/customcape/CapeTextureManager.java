@@ -75,7 +75,7 @@ public final class CapeTextureManager {
             return;
         }
         try (InputStream in = Files.newInputStream(file)) {
-            var image = com.mojang.blaze3d.pipeline.NativeImage.read(in);
+            var image = com.mojang.blaze3d.platform.NativeImage.read(in);
             DynamicTexture newTexture = new DynamicTexture(image);
             Minecraft.getInstance().getTextureManager().register(CAPE_ID, newTexture);
             if (texture != null) {
