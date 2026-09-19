@@ -44,12 +44,15 @@ public class CustomCapeMod {
     private void onRegisterClientCommands(RegisterClientCommandsEvent event) {
         event.getDispatcher().register(Commands.literal("customcape")
             .then(Commands.literal("reload").executes(ctx -> {
-                Minecraft.getInstance().execute(CapeTextureManager::load);
-                ctx.getSource().sendSuccess(() -> Component.literal(
-                        CapeTextureManager.isAvailable()
-                            ? "[CustomCape] 披风贴图已重新加载！"
-                            : "[CustomCape] 未找到 cape.png，请把贴图放到 .minecraft/config/CustomCape/cape.png"),
-                    false);
+                // 反馈必须在加载完成之后给出（load 在渲染线程执行）
+                Minecraft.getInstance().execute(() -> {
+                    CapeTextureManager.load();
+                    ctx.getSource().sendSuccess(() -> Component.literal(
+                            CapeTextureManager.isAvailable()
+                                ? "[CustomCape] 披风贴图已重新加载！"
+                                : "[CustomCape] 未找到 cape.png，请把贴图放到 config/CustomCape/cape.png"),
+                        false);
+                });
                 return 1;
             })));
     }
