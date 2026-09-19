@@ -23,14 +23,15 @@ public abstract class AbstractClientPlayerMixin {
         return (Object) this == Minecraft.getInstance().player;
     }
 
-    @Inject(method = "getCapeTexture", at = @At("HEAD"), cancellable = true)
+    // 1.20.1 Forge 运行期为 SRG 混淆名；双目标写法保证开发环境(mojmap)与生产 jar(SRG) 都能命中
+    @Inject(method = {"getCloakTextureLocation", "m_108561_"}, at = @At("HEAD"), cancellable = true)
     private void customcape$getCapeTexture(CallbackInfoReturnable<ResourceLocation> cir) {
         if (customcape$isLocalPlayer() && CapeTextureManager.isAvailable()) {
             cir.setReturnValue(CapeTextureManager.getCapeTextureId());
         }
     }
 
-    @Inject(method = "canRenderCapeTexture", at = @At("HEAD"), cancellable = true)
+    @Inject(method = {"isCapeLoaded", "m_108555_"}, at = @At("HEAD"), cancellable = true)
     private void customcape$canRenderCapeTexture(CallbackInfoReturnable<Boolean> cir) {
         if (customcape$isLocalPlayer() && CapeTextureManager.isAvailable()) {
             cir.setReturnValue(true);
