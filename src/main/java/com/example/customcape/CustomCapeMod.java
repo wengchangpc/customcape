@@ -54,6 +54,15 @@ public class CustomCapeMod {
                         false);
                 });
                 return 1;
+            }))
+            .then(Commands.literal("fp").executes(ctx -> {
+                CapeConfig.fpCape = !CapeConfig.fpCape;
+                CapeConfig.save();
+                ctx.getSource().sendSuccess(() -> Component.literal(
+                        CapeConfig.fpCape
+                            ? "[CustomCape] 第一人称披风已开启！回头或俯冲即可看到。"
+                            : "[CustomCape] 第一人称披风已关闭。"), false);
+                return 1;
             })));
     }
 }
