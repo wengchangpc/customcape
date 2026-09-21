@@ -104,9 +104,21 @@ public class FirstPersonCapeRenderer {
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
         VertexConsumer vc = bufferSource.getBuffer(RenderType.entitySolid(player.getCloakTextureLocation()));
         model.renderCloak(ps, vc, light, OverlayTexture.NO_OVERLAY);
+
+        // 流光镀层：全亮度自发光再画一遍，呼吸式脉动
+        if (CapeConfig.gloss) {
+            float t = player.tickCount + pt;
+            float pulse = 0.78F + 0.22F * Mth.sin(t * 0.09F);
+            float alpha = Mth.clamp(CapeConfig.glossAlpha, 0.0F, 1.0F) * pulse;
+            VertexConsumer gvc = bufferSource.getBuffer(RenderType.eyes(player.getCloakTextureLocation()));
+            cloakPart.render(ps, gvc, 0xF000F0, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
+        }
         ps.popPose();
 
         // 只冲刷披风用到的缓冲区，不影响其他渲染
         bufferSource.endBatch(RenderType.entitySolid(player.getCloakTextureLocation()));
+        if (CapeConfig.gloss) {
+            bufferSource.endBatch(RenderType.eyes(player.getCloakTextureLocation()));
+        }
     }
 }

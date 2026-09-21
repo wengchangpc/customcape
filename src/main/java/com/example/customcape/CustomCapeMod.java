@@ -41,6 +41,18 @@ public class CustomCapeMod {
         });
     }
 
+    private void onAddLayers(net.minecraftforge.client.event.EntityRenderersEvent.AddLayers event) {
+        // 用原版玩家模型的 bake 产物拿 cloak 部件（几何与原版披风完全一致）
+        var root = event.getContext().bakeLayer(net.minecraft.client.model.geom.ModelLayers.PLAYER);
+        for (String skin : event.getSkins()) {
+            var renderer = event.getSkin(skin);
+            if (renderer instanceof net.minecraft.client.renderer.entity.player.PlayerRenderer pr) {
+                pr.addLayer(new CapeGlossLayer(pr, root));
+            }
+        }
+        CustomCapeMod.LOGGER.info("[CustomCape] 披风流光镀层已挂载！");
+    }
+
     private void onRegisterClientCommands(RegisterClientCommandsEvent event) {
         event.getDispatcher().register(Commands.literal("customcape")
             .then(Commands.literal("reload").executes(ctx -> {
@@ -62,6 +74,25 @@ public class CustomCapeMod {
                         CapeConfig.fpCape
                             ? "[CustomCape] 第一人称披风已开启！回头或俯冲即可看到。"
                             : "[CustomCape] 第一人称披风已关闭。"), false);
+                return 1;
+            }))
+            .then(Commands.literal("vivid").executes(ctx -> {
+                CapeConfig.vivid = !CapeConfig.vivid;
+                CapeConfig.save();
+                Minecraft.getInstance().execute(() -> CapeTextureManager.load()); // 贴图需重载生效
+                ctx.getSource().sendSuccess(() -> Component.literal(
+                        CapeConfig.vivid
+                            ? "[CustomCape] 增艳已开启，贴图已重载！"
+                            : "[CustomCape] 增艳已关闭，贴图已重载。"), false);
+                return 1;
+            }))
+            .then(Commands.literal("gloss").executes(ctx -> {
+                CapeConfig.gloss = !CapeConfig.gloss;
+                CapeConfig.save();
+                ctx.getSource().sendSuccess(() -> Component.literal(
+                        CapeConfig.gloss
+                            ? "[CustomCape] 流光镀层已开启！暗处也会发光。"
+                            : "[CustomCape] 流光镀层已关闭。"), false);
                 return 1;
             })));
     }

@@ -68,6 +68,7 @@ public final class CapeTextureManager {
      * 必须在渲染线程上调用。
      */
     public static void load() {
+        CapeConfig.load();
         Path file = getCapeFile();
         if (!Files.isRegularFile(file)) {
             available = false;
@@ -76,6 +77,9 @@ public final class CapeTextureManager {
         }
         try (InputStream in = Files.newInputStream(file)) {
             var image = com.mojang.blaze3d.platform.NativeImage.read(in);
+            if (CapeConfig.vivid) {
+                enhance(image);
+            }
             DynamicTexture newTexture = new DynamicTexture(image);
             Minecraft.getInstance().getTextureManager().register(CAPE_ID, newTexture);
             if (texture != null) {
@@ -83,10 +87,40 @@ public final class CapeTextureManager {
             }
             texture = newTexture;
             available = true;
-            LOGGER.info("[CustomCape] 披风贴图已加载: {}", file);
+            LOGGER.info("[CustomCape] 披风贴图已加载: {} (vivid={})", file, CapeConfig.vivid);
         } catch (Exception e) {
             available = false;
             LOGGER.error("[CustomCape] 加载披风贴图失败: {}", file, e);
         }
+    }
+
+    /**
+     * 增艳滤镜：提饱和度(+35%) + 提亮度(+10%)。
+     * NativeImage 像素为 ABGR 打包格式。
+     */
+    private static void enhance(com.mojang.blaze3d.platform.NativeImage img) {
+        try {
+            int w = img.getWidth(), h = img.getHeight();
+            for (int y = 0; y < h; y++) {
+                for (int x = 0; x < w; x++) {
+                    int p = img.getPixelRGBA(x, y);
+                    int a = (p >>> 24) & 0xFF;
+                    int b = (p >>> 16) & 0xFF;
+                    int g = (p >>> 8) & 0xFF;
+                    int r = p & 0xFF;
+                    float gray = 0.299F * r + 0.587F * g + 0.114F * b;
+                    r = clamp255((int) ((gray + (r - gray) * 1.35F) * 1.10F));
+                    g = clamp255((int) ((gray + (g - gray) * 1.35F) * 1.10F));
+                    b = clamp255((int) ((gray + (b - gray) * 1.35F) * 1.10F));
+                    img.setPixelRGBA(x, y, (a << 24) | (b << 16) | (g << 8) | r);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.warn("[CustomCape] 增艳处理失败，使用原图", e);
+        }
+    }
+
+    private static int clamp255(int v) {
+        return Math.max(0, Math.min(255, v));
     }
 }
