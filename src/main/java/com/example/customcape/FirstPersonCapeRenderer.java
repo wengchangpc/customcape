@@ -103,7 +103,7 @@ public class FirstPersonCapeRenderer {
         int light = LevelRenderer.getLightColor(player.level(), player.blockPosition());
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
         VertexConsumer vc = bufferSource.getBuffer(RenderType.entitySolid(player.getCloakTextureLocation()));
-        model.cloak.render(ps, vc, light, OverlayTexture.NO_OVERLAY);
+        model.renderCloak(ps, vc, light, OverlayTexture.NO_OVERLAY);
         ps.popPose();
 
         // 只冲刷披风用到的缓冲区，不影响其他渲染
