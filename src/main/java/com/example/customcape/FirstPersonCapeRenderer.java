@@ -35,12 +35,15 @@ import net.minecraftforge.fml.common.Mod;
 public class FirstPersonCapeRenderer {
 
     private static PlayerModel<LocalPlayer> model;
+    private static net.minecraft.client.model.geom.ModelPart cloakPart;
 
     private static boolean ensureModel(Minecraft mc) {
         if (model == null) {
             try {
                 model = new PlayerModel<>(mc.getEntityModels().bakeLayer(ModelLayers.PLAYER), false);
                 model.setAllVisible(false);
+                // 单独 bake 一份拿 cloak 部件（上面 setAllVisible(false) 会隐藏原部件）
+                cloakPart = mc.getEntityModels().bakeLayer(ModelLayers.PLAYER).getChild("cloak");
             } catch (Exception e) {
                 CustomCapeMod.LOGGER.error("[CustomCape] 第一人称披风模型初始化失败", e);
                 return false;
