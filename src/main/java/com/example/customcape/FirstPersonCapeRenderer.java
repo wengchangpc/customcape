@@ -109,12 +109,13 @@ public class FirstPersonCapeRenderer {
         model.renderCloak(ps, vc, light, OverlayTexture.NO_OVERLAY);
 
         // 流光镀层：全亮度自发光再画一遍，呼吸式脉动
+        // eyes 渲染类型为 ONE,ONE 加法混合：alpha 不参与混合，亮度脉动必须走顶点色
         if (CapeConfig.gloss) {
             float t = player.tickCount + pt;
             float pulse = 0.78F + 0.22F * Mth.sin(t * 0.09F);
-            float alpha = Mth.clamp(CapeConfig.glossAlpha, 0.0F, 1.0F) * pulse;
+            float k = Mth.clamp(CapeConfig.glossAlpha * 2.0F, 0.0F, 1.0F) * pulse;
             VertexConsumer gvc = bufferSource.getBuffer(RenderType.eyes(player.getCloakTextureLocation()));
-            cloakPart.render(ps, gvc, 0xF000F0, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
+            cloakPart.render(ps, gvc, 0xF000F0, OverlayTexture.NO_OVERLAY, k, k, k, 1.0F);
         }
         ps.popPose();
 

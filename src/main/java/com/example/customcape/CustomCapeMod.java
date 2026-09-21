@@ -27,6 +27,7 @@ public class CustomCapeMod {
 
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         modBus.addListener(this::onClientSetup);
+        modBus.addListener(this::onAddLayers);
 
         MinecraftForge.EVENT_BUS.addListener(this::onRegisterClientCommands);
 

@@ -53,10 +53,11 @@ public class CapeGlossLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
 
         float t = player.tickCount + partialTick;
         float pulse = 0.78F + 0.22F * Mth.sin(t * 0.09F);
-        float alpha = Mth.clamp(CapeConfig.glossAlpha, 0.0F, 1.0F) * pulse;
+        // eyes 渲染类型为 ONE,ONE 加法混合：alpha 不参与混合，亮度脉动必须走顶点色
+        float k = Mth.clamp(CapeConfig.glossAlpha * 2.0F, 0.0F, 1.0F) * pulse;
 
         VertexConsumer vc = buffer.getBuffer(RenderType.eyes(player.getCloakTextureLocation()));
-        cloak.render(ps, vc, 0xF000F0, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
+        cloak.render(ps, vc, 0xF000F0, OverlayTexture.NO_OVERLAY, k, k, k, 1.0F);
         ps.popPose();
     }
 }
